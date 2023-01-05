@@ -131,7 +131,7 @@
   <link h rel="stylesheet" href="/index.css" />
 </svelte:head>
 
-<div style="width: 50vw; margin: 100px auto">
+<main style="width: 50vw; margin: 100px auto">
   <h1 class="mb-4">Sampler</h1>
   <h3>{status}</h3>
 
@@ -165,7 +165,10 @@
   <div class="container-fluid">
     <div class="row mb-3">
       {#each sounds as sound, index}
-        <div style="background-color: {colors[index]};" class="col-md-3">
+        <div
+          style="background-color: {colors[index]};"
+          class="col-3 text-align-center"
+        >
           <div
             id={sound}
             name={index}
@@ -182,4 +185,4 @@
       {/each}
     </div>
   </div>
-</div>
+</main>

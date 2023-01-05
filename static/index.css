@@ -10,3 +10,17 @@
   width: 300px;
   padding: 3em
 }
+
+@media (max-width: 480px) {
+  .sound {
+    width: fit-content;
+    padding: 1em;
+    margin: 2em !important;
+    font-size: 40%;
+    margin: 0 auto
+  }
+
+  main {
+    width: 90vw !important
+  }
+}
