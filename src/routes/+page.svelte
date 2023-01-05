@@ -42,8 +42,17 @@
   let downloadContainer;
   let status = "";
   let currentID;
+  let mediaRecorder;
+  let chunks = [];
 
   onMount(() => {
+    // microphone recorder
+    navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+      mediaRecorder = new MediaRecorder(stream);
+      // mediaRecorder.start();
+    });
+
+    // Tone.js
     recorder = new Tone.Recorder();
     players = sounds.map((sound) => {
       return new Tone.Player(sound).connect(recorder).toDestination();
@@ -61,13 +70,13 @@
     // download the recording by creating an anchor element and blob url
     const url = URL.createObjectURL(recording);
     const anchor = document.createElement("a");
-    anchor.download = "recording.mp3";
+    anchor.download = url;
     anchor.href = url;
     anchor.textContent = "DOWNLOAD";
     downloadContainer.appendChild(anchor);
 
     // Show recording
-    const audio = document.querySelector("audio");
+    const audio = document.getElementById("sample-recording");
     audio.hidden = false;
     audio.src = url;
     console.log(url);
@@ -95,6 +104,27 @@
       return new Tone.Player(sound).connect(recorder).toDestination();
     });
   }
+  function startAudioRecording() {
+    mediaRecorder.start();
+
+    mediaRecorder.ondataavailable = (e) => {
+      chunks.push(e.data);
+    };
+  }
+  function stopAudioRecording() {
+    mediaRecorder.stop();
+    mediaRecorder.onstop = (e) => {
+      const audio = document.getElementById("audio-recording");
+      const blob = new Blob(chunks, { type: "audio/ogg; codecs=opus" });
+      chunks = [];
+      const audioURL = window.URL.createObjectURL(blob);
+      audio.src = audioURL;
+      audio.hidden = false;
+      const newSoundDiv = document.getElementsByClassName("sound-clip")[0];
+      newSoundDiv.hidden = false;
+      newSoundDiv.id = audioURL;
+    };
+  }
 </script>
 
 <svelte:head>
@@ -104,10 +134,34 @@
 <div style="width: 50vw; margin: 100px auto">
   <h1 class="mb-4">Sampler</h1>
   <h3>{status}</h3>
+
   <div bind:this={downloadContainer} />
-  <audio hidden controls />
-  <button on:click={recorder.start()}>RECORD</button>
-  <button on:click={stopPlay}>STOP</button>
+  <div class="row mb-3">
+    <div class="col">
+      <audio id="sample-recording" hidden controls />
+      <button on:click={recorder.start()}>RECORD</button>
+      <button on:click={stopPlay}>STOP</button>
+    </div>
+    <div class="col ">
+      <div
+        style="background-color: black; color: white"
+        hidden
+        class="sound-clip sound"
+        draggable="true"
+        on:dragover={handleDragEnter}
+        on:dragstart={handleDragStart}
+        on:dragend={handleDragDrop}
+        on:click={() => playSound(index)}
+      >
+        CUSTOM SOUND
+      </div>
+
+      <audio id="audio-recording" hidden controls />
+      <button on:click={startAudioRecording}> RECORD NEW SAMPLE </button>
+      <button on:click={stopAudioRecording}> STOP RECORDING </button>
+    </div>
+  </div>
+
   <div class="container-fluid">
     <div class="row mb-3">
       {#each sounds as sound, index}
