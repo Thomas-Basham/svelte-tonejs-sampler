@@ -40,6 +40,8 @@
   let players;
   let recorder;
   let downloadContainer;
+  let status = "";
+  let currentID;
 
   onMount(() => {
     recorder = new Tone.Recorder();
@@ -66,10 +68,33 @@
 
     // Show recording
     const audio = document.querySelector("audio");
-    audio.hidden = false
+    audio.hidden = false;
     audio.src = url;
     console.log(url);
   };
+
+  function handleDragEnter(e) {
+    status = "You are dragging over the " + e.target.getAttribute("name");
+    currentID = e.target.getAttribute("name");
+  }
+
+  function handleDragStart(e) {
+    status = "Dragging the element " + e.target.getAttribute("id");
+    e.dataTransfer.dropEffect = "move";
+    e.dataTransfer.setData("text", e.target.getAttribute("id"));
+  }
+
+  function handleDragDrop(e) {
+    e.preventDefault();
+    var element_id = e.dataTransfer.getData("text");
+    console.log(currentID);
+    sounds[currentID] = element_id;
+    sounds.splice(currentID, 1, element_id);
+    status = "You dropped " + element_id + " INTO " + currentID;
+    players = sounds.map((sound) => {
+      return new Tone.Player(sound).connect(recorder).toDestination();
+    });
+  }
 </script>
 
 <svelte:head>
@@ -78,6 +103,7 @@
 
 <div style="width: 50vw; margin: 100px auto">
   <h1 class="mb-4">Sampler</h1>
+  <h3>{status}</h3>
   <div bind:this={downloadContainer} />
   <audio hidden controls />
   <button on:click={recorder.start()}>RECORD</button>
@@ -86,7 +112,18 @@
     <div class="row mb-3">
       {#each sounds as sound, index}
         <div style="background-color: {colors[index]};" class="col-md-3">
-          <div class="sound" on:click={() => playSound(index)}>PLAY SOUND</div>
+          <div
+            id={sound}
+            name={index}
+            draggable="true"
+            on:dragover={handleDragEnter}
+            on:dragstart={handleDragStart}
+            on:dragend={handleDragDrop}
+            on:click={() => playSound(index)}
+            class="sound"
+          >
+            PLAY SOUND
+          </div>
         </div>
       {/each}
     </div>
