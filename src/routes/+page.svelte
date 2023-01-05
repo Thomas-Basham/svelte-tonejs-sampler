@@ -37,11 +37,13 @@
     "pink",
     "blue"
   ];
+  let timings = ["1m", "2n", "2t", "4n", "4t", "8n", "8t"];
+  let currentTiming;
   let players;
   let recorder;
   let downloadContainer;
   let status = "";
-  let currentID;
+  let currentSoundIndex;
   let mediaRecorder;
   let chunks = [];
 
@@ -55,13 +57,19 @@
     // Tone.js
     recorder = new Tone.Recorder();
     players = sounds.map((sound) => {
-      return new Tone.Player(sound).connect(recorder).toDestination();
+      let player = new Tone.Player(sound).connect(recorder).toDestination();
+      return player;
     });
   });
 
-  function playSound(index) {
+  function playSound(index, loopPoint) {
     console.log(index);
-    players[index].start();
+    let player = players[index];
+    if (loopPoint) {
+      player.setLoopPoints(loopPoint);
+      player.loop = true;
+    }
+    player.start();
   }
   let stopPlay = async () => {
     // the recorded audio is returned as a blob
@@ -84,25 +92,33 @@
 
   function handleDragEnter(e) {
     status = "You are dragging over the " + e.target.getAttribute("name");
-    currentID = e.target.getAttribute("name");
+    currentSoundIndex = e.target.getAttribute("name");
   }
 
   function handleDragStart(e) {
     status = "Dragging the element " + e.target.getAttribute("id");
     e.dataTransfer.dropEffect = "move";
     e.dataTransfer.setData("text", e.target.getAttribute("id"));
+    if (timings.includes(e.target.textContent)) {
+      currentTiming = e.target.textContent;
+      console.log("TIMING", currentTiming);
+    }
+    // e.dataTransfer.setData("text", e.target.textContent);
+    // console.log("DRAG START", e.dataTransfer.getData("text"))
   }
 
   function handleDragDrop(e) {
     e.preventDefault();
-    var element_id = e.dataTransfer.getData("text");
-    console.log(currentID);
-    sounds[currentID] = element_id;
-    sounds.splice(currentID, 1, element_id);
-    status = "You dropped " + element_id + " INTO " + currentID;
-    players = sounds.map((sound) => {
-      return new Tone.Player(sound).connect(recorder).toDestination();
-    });
+    console.log("DROPPED");
+    // let element_id = e.dataTransfer.getData("text");
+    console.log("current timing ", currentTiming);
+    // sounds[currentSoundIndex] = element_id;
+    // status = "You dropped " + element_id + " INTO " + currentSoundIndex;
+    // players = sounds.map((sound) => {
+    //   let player = new Tone.Player(sound).connect(recorder).toDestination();
+
+    //   return player;
+    // });
   }
   function startAudioRecording() {
     mediaRecorder.start();
@@ -161,6 +177,20 @@
       <button on:click={stopAudioRecording}> STOP RECORDING </button>
     </div>
   </div>
+  <div class="row mb-3 ">
+    {#each timings as timing}
+      <div
+        draggable="true"
+        on:dragover={handleDragEnter}
+        on:dragstart={handleDragStart}
+        on:dragend={handleDragDrop}
+        style="cursor: grab;"
+        class="col"
+      >
+        <div class="timing">{timing}</div>
+      </div>
+    {/each}
+  </div>
 
   <div class="container-fluid">
     <div class="row mb-3">
@@ -172,10 +202,7 @@
           <div
             id={sound}
             name={index}
-            draggable="true"
             on:dragover={handleDragEnter}
-            on:dragstart={handleDragStart}
-            on:dragend={handleDragDrop}
             on:click={() => playSound(index)}
             class="sound"
           >
