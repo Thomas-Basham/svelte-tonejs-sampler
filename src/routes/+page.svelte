@@ -332,7 +332,6 @@
             on:keydown={null}
             class="sound"
           >
-            <!-- {sound.name} -->
             <img
               id={sound.url}
               name={index}
