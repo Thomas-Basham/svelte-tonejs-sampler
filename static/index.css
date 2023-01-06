@@ -10,14 +10,23 @@
   width: 300px;
   padding: 3em
 }
-.timing{
+
+.timing {
   background-color: black;
   color: white;
   text-align: center;
-  
+
+}
+
+.grabbing {
+  cursor: grabbing;
 }
 
 @media (max-width: 480px) {
+  body {
+    font-size: 60%;
+  }
+
   .sound {
     width: fit-content;
     padding: 1em;
