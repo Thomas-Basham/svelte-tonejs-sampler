@@ -282,8 +282,8 @@
         on:dragover={handleDragEnter}
         on:dragstart={handleDragStart}
         on:dragend={handleDragDrop}
-        on:click={() => playSound(index)}
-        on:keydown={() => playSound(index)}
+        on:click={() => playSound()}
+        on:keydown={() => playSound()}
       >
         CUSTOM SOUND
       </div>
@@ -315,24 +315,32 @@
           style="background-color: {colors[index]};"
           class="col-3 text-align-center"
         >
-        <div
-        id={sound.url}
-        name={index}
-        on:dragover={handleDragEnter}
-        on:click={() => playSound(index)}
-        on:keydown={null}
-        class="sound"
-        >
-        <!-- {sound.name} -->
-        <img
-        id={sound.url}
-        name={index}
-        width="100%"
-        alt={sound.name}
-        src={sound.imageUrl}
-        />
-      </div>
-      <input on:input={(e) => players[index].volume.value = e.target.value} type="range" min="-30" max="0" value="-12" />
+          <input
+          style="float: left; height: 50%; margin-top:20% "
+            orient="vertical"
+            on:input={(e) => (players[index].volume.value = e.target.value)}
+            type="range"
+            min="-30"
+            max="0"
+            value="-12"
+          />
+          <div
+            id={sound.url}
+            name={index}
+            on:dragover={handleDragEnter}
+            on:click={() => playSound(index)}
+            on:keydown={null}
+            class="sound"
+          >
+            <!-- {sound.name} -->
+            <img
+              id={sound.url}
+              name={index}
+              width="100%"
+              alt={sound.name}
+              src={sound.imageUrl}
+            />
+          </div>
         </div>
       {/each}
     </div>
