@@ -21,8 +21,10 @@
 - Play Audio samples
 - Drag and drop beat measures to a sample to create a loop
 - Stack loops to create a beat
+- Adjust loop/beat tempo
 - Record and use a new sample from microphone
 - Record loop
+- Adjust volume of each sample
 
 ## Resources
 
