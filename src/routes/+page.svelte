@@ -73,21 +73,7 @@
       "https://cdn-icons-png.flaticon.com/512/6959/6959777.png"
     )
   ];
-  // console.log(sounds);
-  let oldSounds = [
-    "https://cdn.pixabay.com/download/audio/2022/03/10/audio_e9a93ed562.mp3?filename=bassdrum-10-45967.mp3",
-    "https://cdn.pixabay.com/download/audio/2021/08/04/audio_19faff7fe5.mp3?filename=elephant-trumpets-growls-6047.mp3",
-    "https://cdn.pixabay.com/download/audio/2022/10/23/audio_b3ca30d553.mp3?filename=horse-123780.mp3",
-    "https://cdn.pixabay.com/download/audio/2022/06/08/audio_98351be2c8.mp3?filename=duck-quack-112941.mp3",
-    "https://cdn.pixabay.com/download/audio/2021/08/09/audio_ec2624b77c.mp3?filename=failure-drum-sound-effect-2-7184.mp3",
-    "https://cdn.pixabay.com/download/audio/2022/01/18/audio_374cfeefe6.mp3?filename=punch-boxing-02wav-14897.mp3",
-    "https://cdn.pixabay.com/download/audio/2022/11/02/audio_c266b117e9.mp3?filename=hit-drum-superclasher-cinematic-trailer-sound-effects-124759.mp3",
-    "https://cdn.pixabay.com/download/audio/2022/01/18/audio_fb6e6bf2f6.mp3?filename=left-crashwav-14567.mp3",
-    "https://cdn.pixabay.com/download/audio/2021/10/23/audio_6de1a03d51.mp3?filename=casio-sk-1-keyboard-synth-drum-pulse-001-9758.mp3",
-    "https://cdn.pixabay.com/download/audio/2022/01/18/audio_c760f516ad.mp3?filename=hit-of-orchestral-cymbals-and-bass-drum-14471.mp3",
-    "https://cdn.pixabay.com/download/audio/2022/03/19/audio_942d475509.mp3?filename=clap-2-95736.mp3",
-    "https://tonejs.github.io/audio/berklee/gong_1.mp3"
-  ];
+
   let colors = [
     "blue",
     "red",
@@ -112,6 +98,7 @@
   let timings = ["1m", "2n", "2t", "4n", "4t", "8n", "8t", "16n", "16t"];
   let currentTiming;
   let players;
+  let analysers = [];
   let recorder;
   let downloadContainer;
   let status = "";
@@ -119,6 +106,8 @@
   let mediaRecorder;
   let chunks = [];
   let tempo;
+  let currentSoundID;
+
   onMount(() => {
     // microphone recorder
     navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
@@ -132,27 +121,27 @@
 
     recorder = new Tone.Recorder();
     players = sounds.map((sound) => {
-      let player = new Tone.Player(sound.url).connect(recorder).toDestination();
+      // Create an analyser node for each sound
+      let analyser = new Tone.Analyser("waveform", 128);
+
+      // Create player for each sound
+      let player = new Tone.Player(sound.url)
+        .connect(recorder)
+        .connect(analyser)
+        .toDestination();
+      analysers.push(analyser);
+
       return player;
     });
-    // Tone.Transport.start();
-    // Tone.start();
   });
 
-  let playingSamples = [];
-
   function playSound(index, loopPoint) {
-    console.log(index);
     let player = players[index];
+    let analyser = analysers[index];
+
     if (loopPoint) {
       const loop = new Tone.Loop((time) => {
-        // triggered every loopPoint note.
-        console.log(time);
-
-        //
         Tone.Transport.scheduleRepeat(() => {
-          // use the callback time to schedule events
-          // Tone.Transport.nextSubdivision("1m")
           player.start(Tone.Transport.nextSubdivision(loopPoint));
         }, loopPoint);
       }, "1m").start(Tone.Transport.nextSubdivision("1m"));
@@ -160,6 +149,17 @@
       Tone.Transport.start();
       Tone.start();
     } else player.start();
+    console.log(analyser.getValue());
+    const values = analyser.getValue();
+
+    let soundIcon = document.getElementById(loopPoint);
+
+    for (let i = 0; i < values.length; i++) {
+      const amplitude = values[i];
+      // const x = map(i, 0, values.length - 1, 0, width);
+      // const y = height / 2 + amplitude * height;
+      console.log(amplitude);
+    }
   }
   let stopPlay = async () => {
     // the recorded audio is returned as a blob
@@ -183,6 +183,7 @@
   function handleDragEnter(e) {
     status = "You are dragging over the " + e.target.getAttribute("name");
     currentSoundIndex = e.target.getAttribute("name");
+    currentSoundID = e.target.getAttribute("id");
   }
 
   function handleDragStart(e) {
@@ -190,6 +191,7 @@
 
     e.dataTransfer.dropEffect = "move";
     e.dataTransfer.setData("text", e.target.getAttribute("id"));
+
     if (timings.includes(e.target.innerText)) {
       currentTiming = e.target.innerText;
       console.log("TIMING", currentTiming);
@@ -198,12 +200,21 @@
 
   function handleDragDrop(e) {
     e.preventDefault();
-    console.log("DROPPED");
-    // let element_id = e.dataTransfer.getData("text");
-    console.log("current timing ", currentTiming.toString());
+    console.log("DROPPED", e.target.id);
     if (currentTiming) {
-      playSound(currentSoundIndex, currentTiming.toString());
+      playSound(currentSoundIndex, currentTiming);
+
+      // What was dragged
+      let measureIcon = document.getElementById(e.target.id);
+
+      let soundDiv = document.getElementById(currentSoundID + "-holder");
+      const divCopy = document.createElement("div");
+      divCopy.textContent = measureIcon.textContent;
+      divCopy.className = "timing col";
+
+      soundDiv.appendChild(divCopy);
     }
+
     // sounds[currentSoundIndex] = element_id;
     // status = "You dropped " + element_id + " INTO " + currentSoundIndex;
     // players = sounds.map((sound) => {
@@ -264,7 +275,10 @@
           Tempo: {Tone.Transport?.bpm?.value || tempo}
         </div>
         <input
-          on:input={(e) => (Tone.Transport.bpm ?  Tone.Transport.bpm.value = e.target.value : '')}
+          on:input={(e) =>
+            Tone.Transport.bpm
+              ? (Tone.Transport.bpm.value = e.target.value)
+              : ""}
           id="tempo-slider"
           type="range"
           min="40"
@@ -302,6 +316,7 @@
         on:dragend={handleDragDrop}
         style="cursor: grab;"
         class="col"
+        id={timing}
       >
         <div class="timing">{timing}</div>
       </div>
@@ -316,7 +331,7 @@
           class="col-3 text-align-center"
         >
           <input
-          style="float: left; height: 50%; margin-top:20% "
+            style="float: left; height: 50%; margin-top:20% "
             orient="vertical"
             on:input={(e) => (players[index].volume.value = e.target.value)}
             type="range"
@@ -325,7 +340,8 @@
             value="-12"
           />
           <div
-            id={sound.url}
+            data-sound-url={sound.url}
+            id={sound.name}
             name={index}
             on:dragover={handleDragEnter}
             on:click={() => playSound(index)}
@@ -333,13 +349,13 @@
             class="sound"
           >
             <img
-              id={sound.url}
               name={index}
               width="100%"
               alt={sound.name}
               src={sound.imageUrl}
             />
           </div>
+          <div id="{sound.name}-holder" class="row" />
         </div>
       {/each}
     </div>
