@@ -261,10 +261,10 @@
       <button on:click={stopPlay}>STOP</button>
       <div class="border w-50 my-3 p-2">
         <div id="tempo">
-          Tempo: {Tone.Transport.bpm?.value || tempo}
+          Tempo: {Tone.Transport?.bpm?.value || tempo}
         </div>
         <input
-          on:input={(e) => (Tone.Transport.bpm.value = e.target.value)}
+          on:input={(e) => (Tone.Transport.bpm ?  Tone.Transport.bpm.value = e.target.value : '')}
           id="tempo-slider"
           type="range"
           min="40"
