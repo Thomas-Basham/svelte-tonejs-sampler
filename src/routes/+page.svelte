@@ -259,13 +259,19 @@
       <audio id="sample-recording" hidden controls />
       <button on:click={recorder.start()}>RECORD</button>
       <button on:click={stopPlay}>STOP</button>
-      <input
-        on:input={(e) => (Tone.Transport.bpm.value = e.target.value)}
-        type="range"
-        min="40"
-        max="180"
-        value="120"
-      />
+      <div class="border w-50 my-3 p-2">
+        <div id="tempo">
+          Tempo: {Tone.Transport.bpm?.value || tempo}
+        </div>
+        <input
+          on:input={(e) => (Tone.Transport.bpm.value = e.target.value)}
+          id="tempo-slider"
+          type="range"
+          min="40"
+          max="180"
+          value="120"
+        />
+      </div>
     </div>
     <div class="col ">
       <div
@@ -277,6 +283,7 @@
         on:dragstart={handleDragStart}
         on:dragend={handleDragDrop}
         on:click={() => playSound(index)}
+        on:keydown={() => playSound(index)}
       >
         CUSTOM SOUND
       </div>
@@ -308,23 +315,24 @@
           style="background-color: {colors[index]};"
           class="col-3 text-align-center"
         >
-          <div
-            id={sound.url}
-            name={index}
-            on:dragover={handleDragEnter}
-            on:click={() => playSound(index)}
-            on:keydown={null}
-            class="sound"
-          >
-            <!-- {sound.name} -->
-            <img
-              id={sound.url}
-              name={index}
-              width="100%"
-              alt={sound.name}
-              src={sound.imageUrl}
-            />
-          </div>
+        <div
+        id={sound.url}
+        name={index}
+        on:dragover={handleDragEnter}
+        on:click={() => playSound(index)}
+        on:keydown={null}
+        class="sound"
+        >
+        <!-- {sound.name} -->
+        <img
+        id={sound.url}
+        name={index}
+        width="100%"
+        alt={sound.name}
+        src={sound.imageUrl}
+        />
+      </div>
+      <input on:input={(e) => players[index].volume.value = e.target.value} type="range" min="-30" max="0" value="-12" />
         </div>
       {/each}
     </div>
