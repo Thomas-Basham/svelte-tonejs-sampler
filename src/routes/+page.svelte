@@ -96,6 +96,7 @@
     "blue"
   ];
   let timings = ["1m", "2n", "2t", "4n", "4t", "8n", "8t", "16n", "16t"];
+  let effects = ["Reverb", "Big Reverb"];
   let currentTiming;
   let players;
   let analysers = [];
@@ -107,6 +108,7 @@
   let chunks = [];
   let tempo;
   let currentSoundID;
+  let currentSoundEffect;
 
   onMount(() => {
     // microphone recorder
@@ -196,14 +198,30 @@
       currentTiming = e.target.innerText;
       console.log("TIMING", currentTiming);
     }
+
+    if (effects.includes(e.target.innerText)) {
+      currentSoundEffect = e.target.innerText;
+      console.log("currentSoundEffect", currentSoundEffect);
+    }
   }
 
   function handleDragDrop(e) {
     e.preventDefault();
     console.log("DROPPED", e.target.id);
+
+    if (currentSoundEffect) {
+      let player = players[currentSoundIndex];
+      const reverb = new Tone.Reverb().toDestination();
+      const bigReverb = new Tone.Reverb().toDestination();
+      bigReverb.decay = 6
+      // bigReverb.wet = .2
+      bigReverb.preDelay = .09
+      currentSoundEffect == "Reverb" && player.connect(reverb);
+      currentSoundEffect == "Big Reverb" &&  player.connect(bigReverb);
+    }
+
     if (currentTiming) {
       playSound(currentSoundIndex, currentTiming);
-
       // What was dragged
       let measureIcon = document.getElementById(e.target.id);
 
@@ -223,12 +241,15 @@
     //   return player;
     // });
   }
-  function startAudioRecording() {
+  async function startAudioRecording() {
     mediaRecorder.start();
 
     mediaRecorder.ondataavailable = (e) => {
       chunks.push(e.data);
     };
+    const time = Tone.Time("1m").toSeconds();
+    await new Promise((r) => setTimeout(r, time * 1000));
+    stopAudioRecording();
   }
   function stopAudioRecording() {
     mediaRecorder.stop();
@@ -256,7 +277,7 @@
     <div class="col">
       <h1 class="mb-4">Sampler</h1>
     </div>
-    <div class="col">
+    <div class="col right-col">
       <button on:click={Tone.Transport.stop()} class="btn btn-danger"
         >STOP ALL SOUNDS</button
       >
@@ -287,11 +308,11 @@
         />
       </div>
     </div>
-    <div class="col ">
+    <div class="col right-col">
       <div
         style="background-color: black; color: white"
         hidden
-        class="sound-clip sound"
+        class="sound-clip sound right-col"
         draggable="true"
         on:dragover={handleDragEnter}
         on:dragstart={handleDragStart}
@@ -304,7 +325,6 @@
 
       <audio id="audio-recording" hidden controls />
       <button on:click={startAudioRecording}> RECORD NEW SAMPLE </button>
-      <button on:click={stopAudioRecording}> STOP RECORDING </button>
     </div>
   </div>
   <div class="row mb-3 ">
@@ -319,6 +339,21 @@
         id={timing}
       >
         <div class="timing">{timing}</div>
+      </div>
+    {/each}
+  </div>
+  <div class="row mb-3 ">
+    {#each effects as effect}
+      <div
+        draggable="true"
+        on:dragover={handleDragEnter}
+        on:dragstart={handleDragStart}
+        on:dragend={handleDragDrop}
+        style="cursor: grab;"
+        class="col"
+        id={effect}
+      >
+        <div class="effect">{effect}</div>
       </div>
     {/each}
   </div>

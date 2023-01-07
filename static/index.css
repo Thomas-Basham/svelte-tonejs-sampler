@@ -8,11 +8,24 @@
 
 .sound-clip {
   width: 300px;
-  padding: 3em
+  padding: 3em;
+
 }
 
+.right-col{
+  float: right !important;
+  margin-left: auto !important;
+  text-align: right !important;
+}
 .timing {
   background-color: black;
+  color: white;
+  text-align: center;
+
+}
+
+.effect {
+  background-color: orange;
   color: white;
   text-align: center;
 
