@@ -73,7 +73,136 @@
       "https://cdn-icons-png.flaticon.com/512/6959/6959777.png"
     )
   ];
-
+  let MIDI_NUM_NAMES = [
+    "C_1",
+    "C#_1",
+    "D_1",
+    "D#_1",
+    "E_1",
+    "F_1",
+    "F#_1",
+    "G_1",
+    "G#_1",
+    "A_1",
+    "A#_1",
+    "B_1",
+    "C0",
+    "C#0",
+    "D0",
+    "D#0",
+    "E0",
+    "F0",
+    "F#0",
+    "G0",
+    "G#0",
+    "A0",
+    "A#0",
+    "B0",
+    "C1",
+    "C#1",
+    "D1",
+    "D#1",
+    "E1",
+    "F1",
+    "F#1",
+    "G1",
+    "G#1",
+    "A1",
+    "A#1",
+    "B1",
+    "C2",
+    "C#2",
+    "D2",
+    "D#2",
+    "E2",
+    "F2",
+    "F#2",
+    "G2",
+    "G#2",
+    "A2",
+    "A#2",
+    "B2",
+    "C3",
+    "C#3",
+    "D3",
+    "D#3",
+    "E3",
+    "F3",
+    "F#3",
+    "G3",
+    "G#3",
+    "A3",
+    "A#3",
+    "B3",
+    "C4",
+    "C#4",
+    "D4",
+    "D#4",
+    "E4",
+    "F4",
+    "F#4",
+    "G4",
+    "G#4",
+    "A4",
+    "A#4",
+    "B4",
+    "C5",
+    "C#5",
+    "D5",
+    "D#5",
+    "E5",
+    "F5",
+    "F#5",
+    "G5",
+    "G#5",
+    "A5",
+    "A#5",
+    "B5",
+    "C6",
+    "C#6",
+    "D6",
+    "D#6",
+    "E6",
+    "F6",
+    "F#6",
+    "G6",
+    "G#6",
+    "A6",
+    "A#6",
+    "B6",
+    "C7",
+    "C#7",
+    "D7",
+    "D#7",
+    "E7",
+    "F7",
+    "F#7",
+    "G7",
+    "G#7",
+    "A7",
+    "A#7",
+    "B7",
+    "C8",
+    "C#8",
+    "D8",
+    "D#8",
+    "E8",
+    "F8",
+    "F#8",
+    "G8",
+    "G#8",
+    "A8",
+    "A#8",
+    "B8",
+    "C9",
+    "C#9",
+    "D9",
+    "D#9",
+    "E9",
+    "F9",
+    "F#9",
+    "G9"
+  ];
   let colors = [
     "blue",
     "red",
@@ -109,6 +238,7 @@
   let tempo;
   let currentSoundID;
   let currentSoundEffect;
+  let piano;
 
   onMount(() => {
     // microphone recorder
@@ -135,6 +265,14 @@
 
       return player;
     });
+    //	PIANO
+    piano = new Tone.PolySynth(Tone.Synth, {
+      volume: -8,
+      oscillator: {
+        partials: [1, 2, 5]
+      },
+      portamento: 0.005
+    }).toDestination();
   });
 
   function playSound(index, loopPoint) {
@@ -213,11 +351,11 @@
       let player = players[currentSoundIndex];
       const reverb = new Tone.Reverb().toDestination();
       const bigReverb = new Tone.Reverb().toDestination();
-      bigReverb.decay = 6
+      bigReverb.decay = 6;
       // bigReverb.wet = .2
-      bigReverb.preDelay = .09
+      bigReverb.preDelay = 0.09;
       currentSoundEffect == "Reverb" && player.connect(reverb);
-      currentSoundEffect == "Big Reverb" &&  player.connect(bigReverb);
+      currentSoundEffect == "Big Reverb" && player.connect(bigReverb);
     }
 
     if (currentTiming) {
@@ -265,6 +403,152 @@
       newSoundDiv.id = audioURL;
     };
   }
+
+  var familyOfTriads = [
+    [0, 4, 7],
+    [0, 3, 7],
+    [0, 3, 6],
+    [0, 4, 8]
+  ];
+  // https://www.guitarland.com/MusicTheoryWithToneJS/PlayChords.html
+  function makeChordArray(root, chordFormula, timeInterval) {
+    var indexMIDI;
+    var aChord = [];
+    var timeAndChord = [];
+    var timeSum = 0;
+    var toneTime = "0";
+    var chordArray = [];
+    for (let i = 0; i < chordFormula.length; i++) {
+      for (let j = 0; j < chordFormula[i].length; j++) {
+        // add the root to each chord tone
+        indexMIDI = chordFormula[i][j] + Number(root);
+        // tranlate to a pitch/octave name
+        aChord.push(MIDI_NUM_NAMES[indexMIDI]);
+      }
+      let j = 0;
+      // create add time and chord together
+      timeAndChord.push(toneTime);
+      timeAndChord.push(aChord);
+      chordArray.push(timeAndChord);
+      // now calc the time value for next time
+      timeSum += parseInt(timeInterval);
+      toneTime = "0:" + timeSum;
+      console.log(Tone.Time(toneTime));
+      // clear the arrays;
+      aChord = [];
+      timeAndChord = [];
+    }
+    return chordArray;
+  }
+  var root; // let user choose
+  var familyOfTriads = [
+    [0, 4, 7],
+    [0, 3, 7],
+    [0, 3, 6],
+    [0, 4, 8]
+  ];
+  var MAJOR_SCALE = [0, 2, 4, 5, 7, 9, 11, 12];
+  var NATURAL_MINOR_SCALE = [0, 2, 3, 5, 7, 8, 10, 12];
+  var HARMONIC_MINOR_SCALE = [0, 2, 3, 5, 7, 8, 11, 12];
+  var MELODIC_MINOR_SCALE = [0, 2, 3, 5, 7, 9, 11, 12];
+  function getScaleFormula() {
+    console.log("getScaleFormula()");
+    var scaleTypeMenu = document.getElementById("scaleType");
+    var scaleType = scaleTypeMenu.options[scaleTypeMenu.selectedIndex].value;
+    if (scaleType === "Major") {
+      return MAJOR_SCALE;
+    } else if (scaleType === "NaturalMinor") {
+      return NATURAL_MINOR_SCALE;
+    } else if (scaleType === "HarmonicMinor") {
+      return HARMONIC_MINOR_SCALE;
+    } else if (scaleType === "MelodicMinor") {
+      return MELODIC_MINOR_SCALE;
+    } else {
+      return NATURAL_MINOR_SCALE;
+    }
+  }
+
+  function playFamilyOfTriads() {
+    var rootMenu = document.getElementById("root");
+    var root = rootMenu.options[rootMenu.selectedIndex].value;
+
+    // this line is hardwired to the familyOfTriads global array,
+    // that will need to change to make this a more useful function
+    var myChords = makeChordArray(root, familyOfTriads, "2n");
+
+    var chordPart = new Tone.Part(function (time, chord) {
+      piano.triggerAttackRelease(chord, "8n", time);
+    }, myChords).start(0);
+
+    // chordPart.loop = true;
+    // chordPart.loopStart = "0:0";
+    // chordPart.loopEnd = "1:0";
+
+    Tone.Transport.start();
+    // Tone.start()
+  }
+  var romanNumeralToIndex = {
+    I: 0,
+    II: 1,
+    III: 2,
+    IV: 3,
+    V: 4,
+    VI: 5,
+    VII: 6
+  };
+  function createDiatonicTriadFormula_OneOctave(scaleDegreeRoot, scale) {
+    var useMajorV = document.myForm2.V_Major.checked;
+    var oneChord = [];
+    oneChord.push(scale[scaleDegreeRoot % 7]);
+    if (useMajorV && scaleDegreeRoot == 4 && scale == NATURAL_MINOR_SCALE) {
+      oneChord.push(scale[(scaleDegreeRoot + 2) % 7] + 1);
+    } else {
+      oneChord.push(scale[(scaleDegreeRoot + 2) % 7]);
+    }
+    oneChord.push(scale[(scaleDegreeRoot + 4) % 7]);
+    return oneChord;
+  }
+  function playChordProgression() {
+    //    console.log("playChordProgression");
+    var rootMenu = document.getElementById("root2");
+    root = rootMenu.options[rootMenu.selectedIndex].value;
+
+    var chordMenu = document.getElementById("chordProgressions");
+    var chordProgStr = chordMenu.options[chordMenu.selectedIndex].value;
+    var chordProgArr = chordProgStr.split("-");
+    var oneChord = [];
+    var chordArray = [];
+    var scale = getScaleFormula();
+
+    for (let i = 0; i < chordProgArr.length; i++) {
+      var index = romanNumeralToIndex[chordProgArr[i]];
+      oneChord = createDiatonicTriadFormula_OneOctave(index, scale);
+      chordArray.push(oneChord);
+    }
+    let myChords = makeChordArray(root, chordArray, "2");
+    if (!piano) {
+      piano = new Tone.PolySynth(Tone.Synth, {
+        volume: -8,
+        oscillator: {
+          partials: [1, 2, 5]
+        },
+        portamento: 0.005
+      }).toDestination();
+    }
+
+    console.log(myChords);
+    var chordPart = new Tone.Part(function (time, chord) {
+      piano.triggerAttackRelease(chord, "2n", time);
+    }, myChords).start();
+
+    chordPart.loop = true;
+    chordPart.loopEnd = "2m";
+
+    Tone.Transport.start();
+    Tone.start();
+  }
+  // var button1 = document.getElementById("playChordsButton");
+  // button1.onclick = playFamilyOfTriads;
 </script>
 
 <svelte:head>
@@ -393,6 +677,87 @@
           <div id="{sound.name}-holder" class="row" />
         </div>
       {/each}
+    </div>
+    <div class="row">
+      <select id="root">
+        <option value="57">A </option>
+        <option value="58">Bb </option>
+        <option value="59">B </option>
+        <option value="60">C</option></select
+      >
+      <p />
+      <form name="myForm2">
+        chord progression | <select
+          id="chordProgressions"
+          name="chordProgressions"
+        >
+          <option value="I-IV-V-I">I-IV-V-I</option>
+          <option value="I-VII-VI-V">I-VII-VI-V</option>
+          <option value="I-V-IV-V">I-V-IV-V</option>
+          <option value="I-V-VI-IV">I-V-VI-IV</option>
+          <option value="II-V-I-VI">II-V-I-VI</option>
+          <option value="I-II-III-IV">I-II-III-IV</option>
+          <option value="I-III-IV-I">I-III-IV-I</option>
+          <option value="IV-I-V-VI">IV-I-V-VI</option>
+          <option value="IV-V-I-IV">IV-V-I-IV</option>
+        </select>
+
+        <select name="root2" id="root2">
+          <option value="57">A </option><option value="58">Bb </option><option
+            value="59"
+            >B
+          </option><option value="60">C </option><option value="61"
+            >C#
+          </option><option value="61">Db </option><option value="62"
+            >D
+          </option><option value="63">Eb </option><option value="64"
+            >E
+          </option><option value="65">F </option><option value="66"
+            >F#
+          </option><option value="66">Gb </option><option value="67"
+            >G
+          </option><option value="68">Ab </option><option value="69"
+            >A
+          </option></select
+        >
+        <input
+          type="button"
+          class="playButton"
+          VALUE="Play Chord Progression"
+          id="playChordProgressionButton"
+          on:click={playChordProgression}
+        />
+        <input type="button" class="stopButton" VALUE="Stop" />
+
+        | tempo:<select
+          name="tempo2"
+          on:change={(e) => (Tone.Transport.bpm.value = e.target.value)}
+        >
+          <option value="60">60</option>
+          <option value="70">70</option>
+          <option value="80">80</option>
+          <option value="90">90</option>
+          <option value="100">100</option>
+          <option value="110">110</option>
+          <option value="120">120</option>
+          <option value="130">130</option>
+          <option value="140">140</option>
+          <option value="160">160</option>
+          <option value="180">180</option>
+          <option value="200">200</option>
+        </select>
+
+        Scale type:<select name="scaleType" id="scaleType">
+          <option value="Major">Major</option>
+          <option value="NaturalMinor">Natural Minor</option>
+          <option value="HarmonicMinor">Harmonic Minor</option>
+          <option value="MelodicMinor">Melodic Minor</option>
+        </select>
+        <label
+          ><input type="checkbox" name="V_Major" id="V_Major" value="V_Major" />
+          use major V on natural minor
+        </label>
+      </form>
     </div>
   </div>
 </main>
