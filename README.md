@@ -34,3 +34,5 @@
 [Svelte](https://svelte.dev)
 
 [Tone.js](https://tonejs.github.io)
+
+[MusicTheoryWithToneJS/PlayChords.html](https://www.guitarland.com/MusicTheoryWithToneJS/PlayChords.html)
