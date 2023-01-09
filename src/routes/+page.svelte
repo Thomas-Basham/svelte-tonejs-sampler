@@ -468,25 +468,7 @@
     }
   }
 
-  function playFamilyOfTriads() {
-    var rootMenu = document.getElementById("root");
-    var root = rootMenu.options[rootMenu.selectedIndex].value;
 
-    // this line is hardwired to the familyOfTriads global array,
-    // that will need to change to make this a more useful function
-    var myChords = makeChordArray(root, familyOfTriads, "2n");
-
-    var chordPart = new Tone.Part(function (time, chord) {
-      piano.triggerAttackRelease(chord, "8n", time);
-    }, myChords).start(0);
-
-    // chordPart.loop = true;
-    // chordPart.loopStart = "0:0";
-    // chordPart.loopEnd = "1:0";
-
-    Tone.Transport.start();
-    // Tone.start()
-  }
   var romanNumeralToIndex = {
     I: 0,
     II: 1,
@@ -539,13 +521,13 @@
     console.log(myChords);
     var chordPart = new Tone.Part(function (time, chord) {
       piano.triggerAttackRelease(chord, "2n", time);
-    }, myChords).start();
+    }, myChords).start(Tone.Transport.nextSubdivision("1m"));
 
     chordPart.loop = true;
     chordPart.loopEnd = "2m";
 
-    Tone.Transport.start();
-    Tone.start();
+    Tone.Transport.start(Tone.Transport.nextSubdivision("1m"));
+    Tone.start(Tone.Transport.nextSubdivision("1m"));
   }
   // var button1 = document.getElementById("playChordsButton");
   // button1.onclick = playFamilyOfTriads;
@@ -679,13 +661,7 @@
       {/each}
     </div>
     <div class="row">
-      <select id="root">
-        <option value="57">A </option>
-        <option value="58">Bb </option>
-        <option value="59">B </option>
-        <option value="60">C</option></select
-      >
-      <p />
+
       <form name="myForm2">
         chord progression | <select
           id="chordProgressions"
@@ -731,6 +707,7 @@
 
         | tempo:<select
           name="tempo2"
+          value= {Tone.Transport.bpm?.value.toString()}
           on:change={(e) => (Tone.Transport.bpm.value = e.target.value)}
         >
           <option value="60">60</option>
