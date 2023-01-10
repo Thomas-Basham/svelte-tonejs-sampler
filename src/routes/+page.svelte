@@ -707,7 +707,7 @@
 
         | tempo:<select
           name="tempo2"
-          value= {Tone.Transport.bpm?.value.toString()}
+          value= {Tone.Transport?.bpm?.value?.toString()}
           on:change={(e) => (Tone.Transport.bpm.value = e.target.value)}
         >
           <option value="60">60</option>
