@@ -11,7 +11,7 @@
   import Chords from "../components/Chords.svelte";
   export let currentTiming;
   let players;
-  let analysers = [];
+  let analyzers = [];
   let recorder;
   let downloadContainer;
   let status = "";
@@ -44,7 +44,7 @@
         .connect(recorder)
         .connect(analyser)
         .toDestination();
-      analysers.push(analyser);
+      analyzers.push(analyser);
 
       return player;
     });
@@ -60,7 +60,7 @@
 
   function playSound(index, loopPoint) {
     let player = players[index];
-    let analyser = analysers[index];
+    let analyser = analyzers[index];
 
     if (loopPoint) {
       const loop = new Tone.Loop((time) => {
@@ -195,119 +195,7 @@
     };
   }
 
-  // https://www.guitarland.com/MusicTheoryWithToneJS/PlayChords.html
-  function makeChordArray(root, chordFormula, timeInterval) {
-    var indexMIDI;
-    var aChord = [];
-    var timeAndChord = [];
-    var timeSum = 0;
-    var toneTime = "0";
-    var chordArray = [];
-    for (let i = 0; i < chordFormula.length; i++) {
-      for (let j = 0; j < chordFormula[i].length; j++) {
-        // add the root to each chord tone
-        indexMIDI = chordFormula[i][j] + Number(root);
-        // tranlate to a pitch/octave name
-        aChord.push(MIDI_NUM_NAMES[indexMIDI]);
-      }
-      let j = 0;
-      // create add time and chord together
-      timeAndChord.push(toneTime);
-      timeAndChord.push(aChord);
-      chordArray.push(timeAndChord);
-      // now calc the time value for next time
-      timeSum += parseInt(timeInterval);
-      toneTime = "0:" + timeSum;
-      console.log(Tone.Time(toneTime));
-      // clear the arrays;
-      aChord = [];
-      timeAndChord = [];
-    }
-    return chordArray;
-  }
-  var root; // let user choose
-
-  var MAJOR_SCALE = [0, 2, 4, 5, 7, 9, 11, 12];
-  var NATURAL_MINOR_SCALE = [0, 2, 3, 5, 7, 8, 10, 12];
-  var HARMONIC_MINOR_SCALE = [0, 2, 3, 5, 7, 8, 11, 12];
-  var MELODIC_MINOR_SCALE = [0, 2, 3, 5, 7, 9, 11, 12];
-  function getScaleFormula() {
-    console.log("getScaleFormula()");
-    var scaleTypeMenu = document.getElementById("scaleType");
-    var scaleType = scaleTypeMenu.options[scaleTypeMenu.selectedIndex].value;
-    if (scaleType === "Major") {
-      return MAJOR_SCALE;
-    } else if (scaleType === "NaturalMinor") {
-      return NATURAL_MINOR_SCALE;
-    } else if (scaleType === "HarmonicMinor") {
-      return HARMONIC_MINOR_SCALE;
-    } else if (scaleType === "MelodicMinor") {
-      return MELODIC_MINOR_SCALE;
-    } else {
-      return NATURAL_MINOR_SCALE;
-    }
-  }
-
-  var romanNumeralToIndex = {
-    I: 0,
-    II: 1,
-    III: 2,
-    IV: 3,
-    V: 4,
-    VI: 5,
-    VII: 6
-  };
-  function createDiatonicTriadFormula_OneOctave(scaleDegreeRoot, scale) {
-    var useMajorV = document.myForm2.V_Major.checked;
-    var oneChord = [];
-    oneChord.push(scale[scaleDegreeRoot % 7]);
-    if (useMajorV && scaleDegreeRoot == 4 && scale == NATURAL_MINOR_SCALE) {
-      oneChord.push(scale[(scaleDegreeRoot + 2) % 7] + 1);
-    } else {
-      oneChord.push(scale[(scaleDegreeRoot + 2) % 7]);
-    }
-    oneChord.push(scale[(scaleDegreeRoot + 4) % 7]);
-    return oneChord;
-  }
-  function playChordProgression() {
-    //    console.log("playChordProgression");
-    var rootMenu = document.getElementById("root2");
-    root = rootMenu.options[rootMenu.selectedIndex].value;
-
-    var chordMenu = document.getElementById("chordProgressions");
-    var chordProgStr = chordMenu.options[chordMenu.selectedIndex].value;
-    var chordProgArr = chordProgStr.split("-");
-    var oneChord = [];
-    var chordArray = [];
-    var scale = getScaleFormula();
-
-    for (let i = 0; i < chordProgArr.length; i++) {
-      var index = romanNumeralToIndex[chordProgArr[i]];
-      oneChord = createDiatonicTriadFormula_OneOctave(index, scale);
-      chordArray.push(oneChord);
-    }
-    let myChords = makeChordArray(root, chordArray, "2");
-    if (!piano) {
-      piano = new Tone.PolySynth(Tone.Synth, {
-        volume: -8,
-        oscillator: {
-          partials: [1, 2, 5]
-        },
-        portamento: 0.005
-      }).toDestination();
-    }
-
-    console.log(myChords);
-    var chordPart = new Tone.Part(function (time, chord) {
-      piano.triggerAttackRelease(chord, "2n", time);
-    }, myChords).start(Tone.Transport.nextSubdivision("1m"));
-
-    chordPart.loop = true;
-    chordPart.loopEnd = "2m";
-
-    Tone.Transport.start(Tone.Transport.nextSubdivision("1m"));
-    Tone.start(Tone.Transport.nextSubdivision("1m"));
-  }
+  
 </script>
 
 <svelte:head>
