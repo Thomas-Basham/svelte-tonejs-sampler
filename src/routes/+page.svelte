@@ -1,233 +1,15 @@
 <script>
   import { onMount } from "svelte";
   import * as Tone from "tone";
+  import {
+    sounds,
+    MIDI_NUM_NAMES,
+    colors,
+    timings,
+    effects
+  } from "../components/data";
 
-  class SampleObject {
-    constructor(url, name, imageUrl, alt) {
-      // Constructor
-      this.url = url;
-      this.name = name;
-      this.imageUrl = imageUrl;
-      this.alt = alt;
-    }
-  }
-  let sounds = [
-    new SampleObject(
-      "https://cdn.pixabay.com/download/audio/2022/03/10/audio_9fe79df036.mp3?filename=safari-kick-2-37314.mp3",
-      "Bass Drum",
-      "https://cdn-icons-png.flaticon.com/128/1639/1639499.png"
-    ),
-    new SampleObject(
-      "https://cdn.pixabay.com/download/audio/2022/03/15/audio_5245fcde09.mp3?filename=kick-bahadi-89434.mp3",
-      "Kick Drum",
-      "https://cdn-icons-png.flaticon.com/128/4268/4268740.png"
-    ),
-    new SampleObject(
-      "https://cdn.pixabay.com/download/audio/2022/03/19/audio_942d475509.mp3?filename=clap-2-95736.mp3",
-      "Clap",
-      "https://cdn-icons-png.flaticon.com/128/1629/1629860.png"
-    ),
-    new SampleObject(
-      "https://cdn.pixabay.com/download/audio/2022/06/05/audio_97ed83a845.mp3?filename=snare-112754.mp3",
-      "Snare",
-      "https://cdn-icons-png.flaticon.com/128/5482/5482949.png"
-    ),
-    new SampleObject(
-      "https://cdn.pixabay.com/download/audio/2022/03/15/audio_37b9b2d333.mp3?filename=spurc_clhat-80825.mp3",
-      "Hi Hat",
-      "https://cdn-icons-png.flaticon.com/128/2768/2768561.png"
-    ),
-    new SampleObject(
-      "https://cdn.pixabay.com/download/audio/2022/01/18/audio_fb6e6bf2f6.mp3?filename=left-crashwav-14567.mp3",
-      "Cymbal Crash",
-      "https://cdn-icons-png.flaticon.com/128/7662/7662976.png"
-    ),
-    new SampleObject(
-      "https://tonejs.github.io/audio/berklee/gong_1.mp3",
-      "Gong",
-      "https://cdn-icons-png.flaticon.com/128/451/451990.png"
-    ),
-    new SampleObject(
-      "https://cdn.pixabay.com/download/audio/2022/03/26/audio_6f6f7af49d.mp3?filename=fx_wark-107953.mp3",
-      "Fx",
-      "https://cdn-icons-png.flaticon.com/512/5229/5229543.png"
-    ),
-    new SampleObject(
-      "https://cdn.pixabay.com/download/audio/2022/12/06/audio_16a5327172.mp3?filename=burst-128424.mp3",
-      "Burst",
-      "https://cdn-icons-png.flaticon.com/512/959/959711.png"
-    ),
-    new SampleObject(
-      "https://cdn.pixabay.com/download/audio/2021/08/04/audio_19faff7fe5.mp3?filename=elephant-trumpets-growls-6047.mp3",
-      "Elephant",
-      "https://cdn-icons-png.flaticon.com/512/47/47101.png"
-    ),
-    new SampleObject(
-      "https://cdn.pixabay.com/download/audio/2022/10/23/audio_b3ca30d553.mp3?filename=horse-123780.mp3",
-      "Horse",
-      "https://cdn-icons-png.flaticon.com/512/33/33751.png"
-    ),
-    new SampleObject(
-      "https://cdn.pixabay.com/download/audio/2022/06/08/audio_98351be2c8.mp3?filename=duck-quack-112941.mp3",
-      "Duck",
-      "https://cdn-icons-png.flaticon.com/512/6959/6959777.png"
-    )
-  ];
-  let MIDI_NUM_NAMES = [
-    "C_1",
-    "C#_1",
-    "D_1",
-    "D#_1",
-    "E_1",
-    "F_1",
-    "F#_1",
-    "G_1",
-    "G#_1",
-    "A_1",
-    "A#_1",
-    "B_1",
-    "C0",
-    "C#0",
-    "D0",
-    "D#0",
-    "E0",
-    "F0",
-    "F#0",
-    "G0",
-    "G#0",
-    "A0",
-    "A#0",
-    "B0",
-    "C1",
-    "C#1",
-    "D1",
-    "D#1",
-    "E1",
-    "F1",
-    "F#1",
-    "G1",
-    "G#1",
-    "A1",
-    "A#1",
-    "B1",
-    "C2",
-    "C#2",
-    "D2",
-    "D#2",
-    "E2",
-    "F2",
-    "F#2",
-    "G2",
-    "G#2",
-    "A2",
-    "A#2",
-    "B2",
-    "C3",
-    "C#3",
-    "D3",
-    "D#3",
-    "E3",
-    "F3",
-    "F#3",
-    "G3",
-    "G#3",
-    "A3",
-    "A#3",
-    "B3",
-    "C4",
-    "C#4",
-    "D4",
-    "D#4",
-    "E4",
-    "F4",
-    "F#4",
-    "G4",
-    "G#4",
-    "A4",
-    "A#4",
-    "B4",
-    "C5",
-    "C#5",
-    "D5",
-    "D#5",
-    "E5",
-    "F5",
-    "F#5",
-    "G5",
-    "G#5",
-    "A5",
-    "A#5",
-    "B5",
-    "C6",
-    "C#6",
-    "D6",
-    "D#6",
-    "E6",
-    "F6",
-    "F#6",
-    "G6",
-    "G#6",
-    "A6",
-    "A#6",
-    "B6",
-    "C7",
-    "C#7",
-    "D7",
-    "D#7",
-    "E7",
-    "F7",
-    "F#7",
-    "G7",
-    "G#7",
-    "A7",
-    "A#7",
-    "B7",
-    "C8",
-    "C#8",
-    "D8",
-    "D#8",
-    "E8",
-    "F8",
-    "F#8",
-    "G8",
-    "G#8",
-    "A8",
-    "A#8",
-    "B8",
-    "C9",
-    "C#9",
-    "D9",
-    "D#9",
-    "E9",
-    "F9",
-    "F#9",
-    "G9"
-  ];
-  let colors = [
-    "blue",
-    "red",
-    "green",
-    "teal",
-    "pink",
-    "white",
-    "purple",
-    "orange",
-    "yellow",
-    "brown",
-    "blue",
-    "green",
-    "teal",
-    "white",
-    "pink",
-    "purple",
-    "yellow",
-    "brown",
-    "pink",
-    "blue"
-  ];
-  let timings = ["1m", "2n", "2t", "4n", "4t", "8n", "8t", "16n", "16t"];
-  let effects = ["Reverb", "Big Reverb"];
-  let currentTiming;
+  export let currentTiming;
   let players;
   let analysers = [];
   let recorder;
@@ -413,12 +195,6 @@
     };
   }
 
-  var familyOfTriads = [
-    [0, 4, 7],
-    [0, 3, 7],
-    [0, 3, 6],
-    [0, 4, 8]
-  ];
   // https://www.guitarland.com/MusicTheoryWithToneJS/PlayChords.html
   function makeChordArray(root, chordFormula, timeInterval) {
     var indexMIDI;
@@ -450,12 +226,7 @@
     return chordArray;
   }
   var root; // let user choose
-  var familyOfTriads = [
-    [0, 4, 7],
-    [0, 3, 7],
-    [0, 3, 6],
-    [0, 4, 8]
-  ];
+
   var MAJOR_SCALE = [0, 2, 4, 5, 7, 9, 11, 12];
   var NATURAL_MINOR_SCALE = [0, 2, 3, 5, 7, 8, 10, 12];
   var HARMONIC_MINOR_SCALE = [0, 2, 3, 5, 7, 8, 11, 12];
@@ -537,8 +308,6 @@
     Tone.Transport.start(Tone.Transport.nextSubdivision("1m"));
     Tone.start(Tone.Transport.nextSubdivision("1m"));
   }
-  // var button1 = document.getElementById("playChordsButton");
-  // button1.onclick = playFamilyOfTriads;
 </script>
 
 <svelte:head>
@@ -710,26 +479,6 @@
           id="playChordProgressionButton"
           on:click={playChordProgression}
         />
-        <input type="button" class="stopButton" VALUE="Stop" />
-
-        | tempo:<select
-          name="tempo2"
-          value={Tone.Transport?.bpm?.value?.toString()}
-          on:change={(e) => (Tone.Transport.bpm.value = e.target.value)}
-        >
-          <option value="60">60</option>
-          <option value="70">70</option>
-          <option value="80">80</option>
-          <option value="90">90</option>
-          <option value="100">100</option>
-          <option value="110">110</option>
-          <option value="120">120</option>
-          <option value="130">130</option>
-          <option value="140">140</option>
-          <option value="160">160</option>
-          <option value="180">180</option>
-          <option value="200">200</option>
-        </select>
 
         Scale type:<select name="scaleType" id="scaleType">
           <option value="Major">Major</option>

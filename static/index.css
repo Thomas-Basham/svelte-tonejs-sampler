@@ -12,17 +12,19 @@
 
 }
 
-.right-col{
+.right-col {
   float: right !important;
   margin-left: auto !important;
   text-align: right !important;
 }
+
 .timing {
   background-color: black;
   color: white;
   text-align: center;
 
 }
+
 .effect {
   background-color: magenta;
   color: white;
