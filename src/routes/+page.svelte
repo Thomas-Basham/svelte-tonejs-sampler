@@ -194,8 +194,6 @@
       // TODO: Add logic to create new player
     };
   }
-
-  
 </script>
 
 <svelte:head>
