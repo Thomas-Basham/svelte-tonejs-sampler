@@ -23,9 +23,15 @@
   text-align: center;
 
 }
+.effect {
+  background-color: magenta;
+  color: white;
+  text-align: center;
+
+}
 
 .effect {
-  background-color: orange;
+  background-color: magenta;
   color: white;
   text-align: center;
 

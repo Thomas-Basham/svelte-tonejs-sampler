@@ -207,15 +207,16 @@
     "blue",
     "red",
     "green",
-    "orange",
+    "teal",
     "pink",
     "white",
     "purple",
+    "orange",
     "yellow",
     "brown",
     "blue",
     "green",
-    "orange",
+    "teal",
     "white",
     "pink",
     "purple",
@@ -321,9 +322,12 @@
   };
 
   function handleDragEnter(e) {
-    status = "You are dragging over the " + e.target.getAttribute("name");
+    status =
+      "You are dragging over the " +
+      (e.target.getAttribute("id") || e.target.getAttribute("alt"));
     currentSoundIndex = e.target.getAttribute("name");
-    currentSoundID = e.target.getAttribute("id");
+    currentSoundID =
+      e.target.getAttribute("id") || e.target.getAttribute("alt");
   }
 
   function handleDragStart(e) {
@@ -356,6 +360,13 @@
       bigReverb.preDelay = 0.09;
       currentSoundEffect == "Reverb" && player.connect(reverb);
       currentSoundEffect == "Big Reverb" && player.connect(bigReverb);
+
+      let soundDiv = document.getElementById(currentSoundID + "-holder");
+      const divCopy = document.createElement("div");
+      divCopy.textContent = currentSoundEffect;
+      divCopy.className = "effect col";
+
+      soundDiv.appendChild(divCopy);
     }
 
     if (currentTiming) {
@@ -370,15 +381,12 @@
 
       soundDiv.appendChild(divCopy);
     }
-
-    // sounds[currentSoundIndex] = element_id;
-    // status = "You dropped " + element_id + " INTO " + currentSoundIndex;
-    // players = sounds.map((sound) => {
-    //   let player = new Tone.Player(sound).connect(recorder).toDestination();
-
-    //   return player;
-    // });
+    currentSoundEffect = "";
+    currentTiming = "";
+    currentSoundID = "";
+    currentSoundIndex = "";
   }
+
   async function startAudioRecording() {
     mediaRecorder.start();
 
@@ -401,6 +409,7 @@
       const newSoundDiv = document.getElementsByClassName("sound-clip")[0];
       newSoundDiv.hidden = false;
       newSoundDiv.id = audioURL;
+      // TODO: Add logic to create new player
     };
   }
 
@@ -467,7 +476,6 @@
       return NATURAL_MINOR_SCALE;
     }
   }
-
 
   var romanNumeralToIndex = {
     I: 0,
@@ -661,7 +669,6 @@
       {/each}
     </div>
     <div class="row">
-
       <form name="myForm2">
         chord progression | <select
           id="chordProgressions"
@@ -707,7 +714,7 @@
 
         | tempo:<select
           name="tempo2"
-          value= {Tone.Transport?.bpm?.value?.toString()}
+          value={Tone.Transport?.bpm?.value?.toString()}
           on:change={(e) => (Tone.Transport.bpm.value = e.target.value)}
         >
           <option value="60">60</option>
