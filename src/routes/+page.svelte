@@ -8,7 +8,7 @@
     timings,
     effects
   } from "../components/data";
-
+  import Chords from "../components/Chords.svelte";
   export let currentTiming;
   let players;
   let analysers = [];
@@ -437,60 +437,6 @@
         </div>
       {/each}
     </div>
-    <div class="row">
-      <form name="myForm2">
-        chord progression | <select
-          id="chordProgressions"
-          name="chordProgressions"
-        >
-          <option value="I-IV-V-I">I-IV-V-I</option>
-          <option value="I-VII-VI-V">I-VII-VI-V</option>
-          <option value="I-V-IV-V">I-V-IV-V</option>
-          <option value="I-V-VI-IV">I-V-VI-IV</option>
-          <option value="II-V-I-VI">II-V-I-VI</option>
-          <option value="I-II-III-IV">I-II-III-IV</option>
-          <option value="I-III-IV-I">I-III-IV-I</option>
-          <option value="IV-I-V-VI">IV-I-V-VI</option>
-          <option value="IV-V-I-IV">IV-V-I-IV</option>
-        </select>
-
-        <select name="root2" id="root2">
-          <option value="57">A </option><option value="58">Bb </option><option
-            value="59"
-            >B
-          </option><option value="60">C </option><option value="61"
-            >C#
-          </option><option value="61">Db </option><option value="62"
-            >D
-          </option><option value="63">Eb </option><option value="64"
-            >E
-          </option><option value="65">F </option><option value="66"
-            >F#
-          </option><option value="66">Gb </option><option value="67"
-            >G
-          </option><option value="68">Ab </option><option value="69"
-            >A
-          </option></select
-        >
-        <input
-          type="button"
-          class="playButton"
-          VALUE="Play Chord Progression"
-          id="playChordProgressionButton"
-          on:click={playChordProgression}
-        />
-
-        Scale type:<select name="scaleType" id="scaleType">
-          <option value="Major">Major</option>
-          <option value="NaturalMinor">Natural Minor</option>
-          <option value="HarmonicMinor">Harmonic Minor</option>
-          <option value="MelodicMinor">Melodic Minor</option>
-        </select>
-        <label
-          ><input type="checkbox" name="V_Major" id="V_Major" value="V_Major" />
-          use major V on natural minor
-        </label>
-      </form>
-    </div>
+    <Chords {MIDI_NUM_NAMES} {Tone} {piano} />
   </div>
 </main>
