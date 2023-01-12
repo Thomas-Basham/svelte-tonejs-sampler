@@ -39,8 +39,12 @@
 
 }
 
+.grab {
+  cursor: grab;
+}
+
 .grabbing {
-  cursor: grabbing;
+  cursor: grabbing !important;
 }
 
 @media (max-width: 480px) {

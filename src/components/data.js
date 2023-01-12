@@ -1,4 +1,4 @@
-class SampleObject {
+export class SampleObject {
   constructor(url, name, imageUrl, alt) {
     this.url = url;
     this.name = name;

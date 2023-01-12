@@ -1,4 +1,7 @@
 <script>
+  // TODO: add chords and melodies? All of this code is working,
+  //       it just doesn't really pair with the sampler well
+  // import Chords from "../components/Chords.svelte";
   import { onMount } from "svelte";
   import * as Tone from "tone";
   import {
@@ -6,9 +9,9 @@
     MIDI_NUM_NAMES,
     colors,
     timings,
-    effects
+    effects,
+    SampleObject
   } from "../components/data";
-  import Chords from "../components/Chords.svelte";
   export let currentTiming;
   let players;
   let analyzers = [];
@@ -22,6 +25,7 @@
   let currentSoundID;
   let currentSoundEffect;
   let piano;
+  let customSounds = [] ;
 
   onMount(() => {
     // microphone recorder
@@ -114,7 +118,8 @@
 
   function handleDragStart(e) {
     status = "Dragging the element " + e.target.getAttribute("id");
-
+    e.target.className += ' grabbing'
+    console.log(e.target.className)
     e.dataTransfer.dropEffect = "move";
     e.dataTransfer.setData("text", e.target.getAttribute("id"));
 
@@ -182,16 +187,26 @@
   function stopAudioRecording() {
     mediaRecorder.stop();
     mediaRecorder.onstop = (e) => {
-      const audio = document.getElementById("audio-recording");
+      // create blob from recording
       const blob = new Blob(chunks, { type: "audio/ogg; codecs=opus" });
-      chunks = [];
+     
+      // reset chunks
+      chunks = []; 
       const audioURL = window.URL.createObjectURL(blob);
-      audio.src = audioURL;
-      audio.hidden = false;
-      const newSoundDiv = document.getElementsByClassName("sound-clip")[0];
-      newSoundDiv.hidden = false;
-      newSoundDiv.id = audioURL;
-      // TODO: Add logic to create new player
+            
+      let sampleObj = new SampleObject(audioURL, "CUSTOM SOUND","https://cdn-icons-png.flaticon.com/128/865/865548.png");
+      sounds.push(sampleObj)
+
+      let analyser = new Tone.Analyser("waveform", 128);
+      let player = new Tone.Player(audioURL)
+      .connect(recorder)
+      .connect(analyser)
+      .unsync()
+      .toDestination();
+      analyzers.push(analyser);
+      players.push(player);
+      customSounds = sounds.slice(11, -1)
+
     };
   }
 </script>
@@ -238,21 +253,42 @@
       </div>
     </div>
     <div class="col right-col">
-      <div
-        style="background-color: black; color: white"
-        hidden
-        class="sound-clip sound right-col"
-        draggable="true"
-        on:dragover={handleDragEnter}
-        on:dragstart={handleDragStart}
-        on:dragend={handleDragDrop}
-        on:click={() => playSound()}
-        on:keydown={() => playSound()}
-      >
-        CUSTOM SOUND
+      <div class="row mb-3">
+        {#each customSounds as sound, index}
+          <div
+            style="background-color: {colors[index]};"
+            class="col-3 text-align-center"
+          >
+            <input
+              style="float: left; height: 50%; margin-top:20% "
+              orient="vertical"
+              on:input={(e) => (players[index + 12].volume.value = e.target.value)}
+              type="range"
+              min="-30"
+              max="0"
+              value="-12"
+            />
+            <div
+              data-sound-url={sound.url}
+              id={sound.name}
+              name={index + 12}
+              on:dragover={handleDragEnter}
+              on:click={() => playSound(index + 12)}
+              on:keydown={null}
+              class="sound"
+            >
+              <img
+                name={index + 12}
+                width="100%"
+                alt={sound.name}
+                src={sound.imageUrl}
+              />
+            </div>
+            <div id="{sound.name}-holder" class="row" />
+          </div>
+        {/each}
       </div>
-
-      <audio id="audio-recording" hidden controls />
+  
       <button on:click={startAudioRecording}> RECORD NEW SAMPLE </button>
     </div>
   </div>
@@ -263,8 +299,7 @@
         on:dragover={handleDragEnter}
         on:dragstart={handleDragStart}
         on:dragend={handleDragDrop}
-        style="cursor: grab;"
-        class="col"
+        class="col grab"
         id={timing}
       >
         <div class="timing">{timing}</div>
@@ -323,6 +358,6 @@
         </div>
       {/each}
     </div>
-    <Chords {MIDI_NUM_NAMES} {Tone} {piano} />
+    <!-- <Chords {MIDI_NUM_NAMES} {Tone} {piano} /> -->
   </div>
 </main>
