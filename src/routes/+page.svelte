@@ -25,7 +25,7 @@
   let currentSoundID;
   let currentSoundEffect;
   let piano;
-  let customSounds = [] ;
+  let customSounds = [];
 
   onMount(() => {
     // microphone recorder
@@ -118,8 +118,8 @@
 
   function handleDragStart(e) {
     status = "Dragging the element " + e.target.getAttribute("id");
-    e.target.className += ' grabbing'
-    console.log(e.target.className)
+    e.target.className += " grabbing";
+    console.log(e.target.className);
     e.dataTransfer.dropEffect = "move";
     e.dataTransfer.setData("text", e.target.getAttribute("id"));
 
@@ -189,24 +189,27 @@
     mediaRecorder.onstop = (e) => {
       // create blob from recording
       const blob = new Blob(chunks, { type: "audio/ogg; codecs=opus" });
-     
+
       // reset chunks
-      chunks = []; 
+      chunks = [];
       const audioURL = window.URL.createObjectURL(blob);
-            
-      let sampleObj = new SampleObject(audioURL, "CUSTOM SOUND","https://cdn-icons-png.flaticon.com/128/865/865548.png");
-      sounds.push(sampleObj)
+
+      let sampleObj = new SampleObject(
+        audioURL,
+        "CUSTOM SOUND",
+        "https://cdn-icons-png.flaticon.com/128/865/865548.png"
+      );
+      sounds.push(sampleObj);
 
       let analyser = new Tone.Analyser("waveform", 128);
       let player = new Tone.Player(audioURL)
-      .connect(recorder)
-      .connect(analyser)
-      .unsync()
-      .toDestination();
+        .connect(recorder)
+        .connect(analyser)
+        .unsync()
+        .toDestination();
       analyzers.push(analyser);
       players.push(player);
-      customSounds = sounds.slice(11, -1)
-
+      customSounds = sounds.slice(11, -1);
     };
   }
 </script>
@@ -235,14 +238,16 @@
       <audio id="sample-recording" hidden controls />
       <button on:click={recorder.start()}>RECORD</button>
       <button on:click={stopPlay}>STOP</button>
-      <div class="border w-50 my-3 p-2">
+      <div class="tempo border my-3 p-2">
         <div id="tempo">
-          Tempo: {Tone.Transport?.bpm?.value || tempo}
+          Tempo: {(Tone.Transport?.bpm?.value &&
+            Math.floor(Tone.Transport?.bpm?.value)) ||
+            tempo}
         </div>
         <input
           on:input={(e) =>
             Tone.Transport.bpm
-              ? (Tone.Transport.bpm.value = e.target.value)
+              ? (Tone.Transport.bpm.value = Math.floor(e.target.value))
               : ""}
           id="tempo-slider"
           type="range"
@@ -257,12 +262,12 @@
         {#each customSounds as sound, index}
           <div
             style="background-color: {colors[index]};"
-            class="col-3 text-align-center"
+            class="col-3 sound-col"
           >
             <input
-              style="float: left; height: 50%; margin-top:20% "
-              orient="vertical"
-              on:input={(e) => (players[index + 12].volume.value = e.target.value)}
+              style="float: left;"
+              on:input={(e) =>
+                (players[index + 12].volume.value = e.target.value)}
               type="range"
               min="-30"
               max="0"
@@ -288,7 +293,7 @@
           </div>
         {/each}
       </div>
-  
+
       <button on:click={startAudioRecording}> RECORD NEW SAMPLE </button>
     </div>
   </div>
@@ -326,12 +331,11 @@
     <div class="row mb-3">
       {#each sounds as sound, index}
         <div
-          style="background-color: {colors[index]};"
-          class="col-3 text-align-center"
+          style="background-color: {colors[index]};text-align:center;  "
+          class="col-3 sound-col"
         >
           <input
-            style="float: left; height: 50%; margin-top:20% "
-            orient="vertical"
+            style="margin: 3px auto; "
             on:input={(e) => (players[index].volume.value = e.target.value)}
             type="range"
             min="-30"
