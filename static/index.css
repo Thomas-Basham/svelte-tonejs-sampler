@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Fira+Mono:wght@700&family=Oswald:wght@600&family=Roboto:wght@400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fira+Mono:wght@700&family=Oswald:wght@400&family=Roboto:wght@400&display=swap');
 
 html,
 body {
@@ -15,6 +15,12 @@ body {
   --custom-border-radius: 5px;
   --custom-spacing: 5px;
   font-family: var(--custom-font-family) !important;
+
+}
+
+h1,
+h2 {
+  font-family: "Oswald", sans-serif;
 
 }
 

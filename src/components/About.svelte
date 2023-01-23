@@ -1,4 +1,13 @@
 <div class="about mt-5">
+  <h2 class="border-bottom">HOW TO USE</h2>
+  <p>
+    Play the samples by touch/click or drag one of the black time signature's
+    over a sample to start a loop. Drag one of the reverbs over a sample to add
+    reverb to that sample.
+  </p>
+  <p>Record your own samples or record and download your loop. Have fun!</p>
+  <h2 class="border-bottom">ABOUT</h2>
+
   <p>
     Introducing the Svelte ToneJS Sampler app - a powerful and intuitive tool
     for creating and manipulating samples in real-time.
