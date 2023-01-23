@@ -3,6 +3,7 @@
   //       it just doesn't really pair with the sampler well
   // import Chords from "../components/Chords.svelte";
   import { onMount } from "svelte";
+  import About from "../components/About.svelte";
   import * as Tone from "tone";
   import {
     sounds,
@@ -362,6 +363,7 @@
         </div>
       {/each}
     </div>
+    <About/>
     <!-- <Chords {MIDI_NUM_NAMES} {Tone} {piano} /> -->
   </div>
 </main>
