@@ -36,6 +36,9 @@ Whether you're a musician, producer, or just a hobbyist, the Svelte ToneJS Sampl
 - Record loop
 - Adjust volume of each sample
 
+![screenshot](static/screenshots/svelte-sampler-screenshot_1.png)
+![screenshot](static/screenshots/svelte-sampler-screenshot_2.png)
+
 ## Resources
 
 [Svelte](https://svelte.dev)
