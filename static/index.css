@@ -28,8 +28,7 @@ h2 {
   /* border: 1px solid black; */
   cursor: pointer;
   text-align: center;
-  padding: 5em;
-
+  padding: 1em;
 }
 
 .custom-sound{
@@ -38,6 +37,7 @@ h2 {
   padding: 2em;
 }
 .sound-col{
+  padding: 2px;
   border-radius: var(--custom-border-radius) !important;
 
 }

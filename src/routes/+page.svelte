@@ -368,7 +368,7 @@
             <img
               style="fill: {colors[index]}"
               name={index}
-              width="100%"
+              width="40%"
               alt={sound.name}
               src={sound.imageUrl}
             />
