@@ -9,10 +9,10 @@ body {
   --custom-box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.8);
   --custom-color: #fff;
   --custom-color-brand: #24b47e;
-  --custom-color-brand-secondary: #b88c24;
+  --custom-color-brand-secondary: magenta;
   --custom-color-secondary: #666;
   --custom-border: 2px solid #fff;
-  --custom-border-radius: 5px;
+  --custom-border-radius: 8px;
   --custom-spacing: 5px;
   font-family: var(--custom-font-family) !important;
 
@@ -32,6 +32,15 @@ h2 {
 
 }
 
+.custom-sound{
+  cursor: pointer;
+  text-align: center;
+  padding: 2em;
+}
+.sound-col{
+  border-radius: var(--custom-border-radius) !important;
+
+}
 .sound-clip {
   width: 300px;
   padding: 3em;
@@ -45,23 +54,46 @@ h2 {
 }
 
 .timing {
-  background-color: black;
-  color: white;
+  border:solid var(--custom-color-brand) 2px;
+  color: var(--custom-color-brand);
   text-align: center;
+  border-radius: var(--custom-border-radius);
 
 }
 
-.effect {
-  background-color: magenta;
-  color: white;
-  text-align: center;
-
+.record-btn{
+  background-color: inherit;
+  border: solid red 2px;
+  color: red;
+  border-radius: var(--custom-border-radius);
+}
+.stop-btn{
+  background-color: inherit;
+  border: solid red 2px;
+  color: red;
+  border-radius: var(--custom-border-radius);
 }
 
+.download-container{
+  margin-bottom: 1em;
+}
+.download-link{
+  text-decoration: none;
+  border: solid var(--custom-color-brand) 2px;
+  border-radius: var(--custom-border-radius);
+  color: var(--custom-color-brand);
+  padding: 4px;
+  margin-right: 2px;
+}
+.download-link:hover{
+  color: var(--custom-color);
+  background-color: var(--custom-color-brand);
+}
 .effect {
-  background-color: magenta;
-  color: white;
+  border:solid var(--custom-color-brand-secondary) 2px;
+  color: var(--custom-color-brand-secondary);
   text-align: center;
+  border-radius: var(--custom-border-radius);
 
 }
 

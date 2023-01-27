@@ -1,7 +1,7 @@
 <div class="about mt-5">
   <h2 class="border-bottom">HOW TO USE</h2>
   <p>
-    Play the samples by touch/click or drag one of the black time signature's
+    Play the samples by touch/click or drag one of the green time signature's
     over a sample to start a loop. Drag one of the reverbs over a sample to add
     reverb to that sample.
   </p>

@@ -11,7 +11,7 @@
     colors,
     timings,
     effects,
-    SampleObject
+    SampleObject,
   } from "../components/data";
   export let currentTiming;
   let players;
@@ -27,6 +27,7 @@
   let currentSoundEffect;
   let piano;
   let customSounds = [];
+  let recording = false;
 
   onMount(() => {
     // microphone recorder
@@ -57,9 +58,9 @@
     piano = new Tone.PolySynth(Tone.Synth, {
       volume: -8,
       oscillator: {
-        partials: [1, 2, 5]
+        partials: [1, 2, 5],
       },
-      portamento: 0.005
+      portamento: 0.005,
     }).toDestination();
   });
 
@@ -91,14 +92,15 @@
   }
   let stopPlay = async () => {
     // the recorded audio is returned as a blob
-    const recording = await recorder.stop();
-
+    const record = await recorder.stop();
+    recording = false;
     // download the recording by creating an anchor element and blob url
-    const url = URL.createObjectURL(recording);
+    const url = URL.createObjectURL(record);
     const anchor = document.createElement("a");
     anchor.download = url;
     anchor.href = url;
     anchor.textContent = "DOWNLOAD";
+    anchor.className = "download-link";
     downloadContainer.appendChild(anchor);
 
     // Show recording
@@ -210,7 +212,7 @@
         .toDestination();
       analyzers.push(analyser);
       players.push(player);
-      customSounds = sounds.slice(11, -1);
+      customSounds = sounds.slice(12);
     };
   }
 </script>
@@ -226,19 +228,30 @@
       <h1 class="mb-4">Sampler</h1>
     </div>
     <div class="col right-col">
-      <button on:click={Tone.Transport.stop()} class="btn btn-danger"
+      <button on:click={Tone.Transport.stop()} class="btn  btn-outline-danger"
         >STOP ALL SOUNDS</button
       >
     </div>
   </div>
   <h3>{status}</h3>
 
-  <div bind:this={downloadContainer} />
+  <div class="download-container" bind:this={downloadContainer} />
   <div class="row mb-3">
     <div class="col">
       <audio id="sample-recording" hidden controls />
-      <button on:click={recorder.start()}>RECORD</button>
-      <button on:click={stopPlay}>STOP</button>
+      <br />
+      {#if !recording}
+        <button
+          class="record-btn"
+          on:click={() => {
+            recording = true;
+            recorder.start();
+          }}>RECORD</button
+        >
+      {/if}
+      {#if recording}
+        <button class="stop-btn" on:click={stopPlay}>STOP</button>
+      {/if}
       <div class="tempo border my-3 p-2">
         <div id="tempo">
           Tempo: {(Tone.Transport?.bpm?.value &&
@@ -264,38 +277,37 @@
           <div
             style="background-color: {colors[index]};"
             class="col-3 sound-col"
-          >
+            id="sound-col-{sound}"
+            
+            >
             <input
-              style="float: left;"
-              on:input={(e) =>
+            style="float: left; width:100%"
+            on:input={(e) =>
                 (players[index + 12].volume.value = e.target.value)}
               type="range"
               min="-30"
               max="0"
               value="-12"
-            />
-            <div
-              data-sound-url={sound.url}
+              />
+              <div
               id={sound.name}
+              data-sound-url={sound.url}
               name={index + 12}
               on:dragover={handleDragEnter}
               on:click={() => playSound(index + 12)}
               on:keydown={null}
-              class="sound"
+              class="custom-sound"
             >
-              <img
-                name={index + 12}
-                width="100%"
-                alt={sound.name}
-                src={sound.imageUrl}
-              />
+              <p style="text-align: center; margin: 0 auto" class="text-align-center">CUSTOM SOUND</p>
             </div>
             <div id="{sound.name}-holder" class="row" />
           </div>
         {/each}
       </div>
 
-      <button on:click={startAudioRecording}> RECORD NEW SAMPLE </button>
+      <button class="record-btn" on:click={startAudioRecording}>
+        RECORD NEW SAMPLE
+      </button>
     </div>
   </div>
   <div class="row mb-3 ">
@@ -332,7 +344,8 @@
     <div class="row mb-3">
       {#each sounds as sound, index}
         <div
-          style="background-color: {colors[index]};text-align:center;  "
+          id="sound-col-{sound}"
+          style="border:solid {colors[index]} 2px ;text-align:center;  "
           class="col-3 sound-col"
         >
           <input
@@ -353,6 +366,7 @@
             class="sound"
           >
             <img
+              style="fill: {colors[index]}"
               name={index}
               width="100%"
               alt={sound.name}
@@ -363,7 +377,7 @@
         </div>
       {/each}
     </div>
-    <About/>
+    <About />
     <!-- <Chords {MIDI_NUM_NAMES} {Tone} {piano} /> -->
   </div>
 </main>
